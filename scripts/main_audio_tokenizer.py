@@ -32,7 +32,7 @@ def get_args_parser():
     parser.add_argument('--eval-freq', default=20_000, type=int, help='evaluation frequency')
     parser.add_argument('--save-freq', default=1_000, type=int, help='save frequency')
 
-     # EMA
+    # EMA
     parser.add_argument('--use-ema', action='store_true', help='use exponential moving average')
     parser.add_argument('--ema-decay', default=0.999, type=float, help='decay for EMA')
     parser.add_argument('--cpu-ema', action='store_true', help='put EMA weights on CPU')

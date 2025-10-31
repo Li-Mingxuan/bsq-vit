@@ -36,7 +36,6 @@ class AudioVQModel(nn.Module):
         
         self.quant_embed = nn.Linear(in_features=audioconfig['width'], out_features=embed_dim)
         self.post_quant_embed = nn.Linear(in_features=embed_dim, out_features=daudioconfig['width'])
-        self.l2_norm = l2_norm
         self.logit_laplace = logit_laplace
         self.clamp_range = clamp_range
         if self.logit_laplace:
