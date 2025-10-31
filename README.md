@@ -21,6 +21,23 @@ mamba env create -f bsqvit-env.yaml
 mamba activate bsqvit
 ```
 
+## Audio/Speech Adaptation
+
+This repository now includes an audio/speech adaptation inspired by **AudioMAE** and **Conformer** architectures. See [AUDIO_README.md](AUDIO_README.md) for detailed documentation on using BSQ-ViT for audio tokenization.
+
+### Quick Start for Audio
+
+```bash
+# Install audio dependencies
+mamba install -c conda-forge torchaudio librosa
+
+# Test the audio model
+python scripts/test_audio_model.py
+
+# Train on your audio data
+python scripts/main_audio_tokenizer.py configs/tokenizer/audio_simple_bsq_b18.yaml --output-dir ./outputs
+```
+
 ## Main Results
 
 ### Image Reconstruction (IN-1K val 256x256)
