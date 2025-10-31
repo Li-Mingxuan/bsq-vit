@@ -1,0 +1,98 @@
+model:
+  target: transcoder.models.audiobsq.AudioBSQModel
+  params:
+    embed_dim: 18
+    embed_group_size: 1
+    l2_norm: True
+    persample_entropy_compute: 'analytical'
+    post_q_l2_norm: True
+    logit_laplace: False
+    beta: 0.
+    audioconfig:
+      input_size: 128  # number of mel bins
+      input_length: 1024  # number of time frames
+      patch_size: 16
+      width: 768
+      layers: 12
+      heads: 12
+      mlp_ratio: 4
+      drop_rate: 0.
+      use_conv_module: True  # Conformer-style convolution
+      conv_kernel_size: 31
+
+loss:
+  target: transcoder.losses.vqperceptual.VQLPIPSWithDiscriminator
+  params:
+    disc_type: 'patchgan'
+    disc_input_size: 128
+    disc_loss: 'hinge'
+    disc_reg_freq: 16
+    disc_conditional: False
+    disc_in_channels: 1
+    disc_start: 0
+    disc_weight: 0.1
+    codebook_weight: 0.1
+    codebook_rampup_multiplier: 3.0
+    codebook_rampup_steps: 2_000
+    perceptual_weight: 0.0
+    use_adaptive_disc_weight: False
+
+data:
+  dataset_type: 'audio_folder'
+  sample_rate: 16000
+  n_mels: 128
+  n_fft: 1024
+  hop_length: 160
+  target_length: 1024
+  batch_size: 32
+  num_workers: 8
+  train:
+    target: transcoder.data.audio_dataset.AudioFolderDataset
+    params:
+      root: '/path/to/audio/train'
+      sample_rate: 16000
+      n_mels: 128
+      n_fft: 1024
+      hop_length: 160
+      target_length: 1024
+      normalize: True
+      augment: True
+  val:
+    target: transcoder.data.audio_dataset.AudioFolderDataset
+    params:
+      root: '/path/to/audio/val'
+      sample_rate: 16000
+      n_mels: 128
+      n_fft: 1024
+      hop_length: 160
+      target_length: 1024
+      normalize: True
+      augment: False
+  clamp_range: [-80, 0]
+
+optimizer:
+  disable_amp: False
+  use_bf16: True
+  base_lr: 4e-7
+  max_iter: 500_000
+  lr_scheduler_config:
+      target: transcoder.optim.schedulers.LambdaWarmUpCosineScheduler
+      params:
+        warm_up_steps: 5_000
+        max_decay_steps: 500_000
+        lr_start: 0.1
+        lr_max: 1.0
+        lr_min: 0.5
+  target: torch.optim.AdamW
+  params:
+    weight_decay: 1e-4
+    betas: [0.9, 0.99]
+    eps: 1e-8
+
+evaluation:
+  compute_mse: True
+  compute_mae: True
+
+wandb:
+  project: audio-transcoder
+  run: audio_simple_bsq_b18
